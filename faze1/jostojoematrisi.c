@@ -25,22 +25,27 @@ int main()
     {
         for (j = 0; j <= N - n; j++)
         {
-            for (k = 0; k < m; k++)
+            if (u[i][j] == h[0][0])
             {
-                for (o = 0; o < n; o++)
+                for (k = 0; k < m; k++)
                 {
-                    if (u[i + k][j + o] == h[k][o])
+
+                    for (o = 0; o < n; o++)
                     {
+                        if (u[i + k][j + o] != h[k][o])
+                        {
+                            break;
+                        }
                         c++;
                     }
                 }
             }
             if (c == m * n)
             {
-                printf("(%d, %d)",i,j);
+                printf("(%d, %d)", i, j);
                 return 0;
             }
-            c=0;
+            c = 0;
         }
     }
     printf("-1");
