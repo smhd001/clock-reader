@@ -1,13 +1,9 @@
 #include <stdio.h>
 #include <bmpio.h>
-#include <math.h>
+
 unsigned char pic[2000][2000][3];
 unsigned char tmp[2000][2000][3];
-unsigned char out[2000][2000][3];
-// pic[][][0]r
-// pic[][][1]g
-// pic[][][2]b
-// unsigned char tmp[2000][2000][3];
+unsigned char out[2000][2000][3];;
 
 void xbozorg(double nesbat, int nwidth, int height);
 void ybozorg(double nesbat, int nwidth, int nheight);
@@ -22,8 +18,6 @@ int main()
     scanf("%d%d", &nwidth, &nheight);
     double x_nesbat = nwidth * 1.0 / width;
     double y_nesbat = nheight * 1.0 / height;
-    printf("%d   %d", nwidth, width);
-    printf("%lf", x_nesbat);
     xbozorg(x_nesbat, nwidth, height);
     ybozorg(y_nesbat, nwidth, nheight);
     saveBMP(out, nwidth, nheight, "outre.bmp");
