@@ -17,21 +17,22 @@ int main()
         {
             sprintf(p, "./dataset/%d/%d.bmp", i, j);
             crop(p);
-            c++;
         }
     }
+    /*
     printf("done\n");
     c = 1;
-
+    getchar();
     for (i = 0; i <= 9; i++)
     {
         for (j = 1; j <= 15; j++)
         {
             sprintf(p, "out%d.bmp", c);
-            resize(p, 740, 887);
-            c++;
+            resize(p, 887, 887);
         }
     }
+    printf("secenddone");
+    getchar();
     //start learning
     for (i = 0; i <= 9; i++)
     {
@@ -45,7 +46,7 @@ int main()
 
             for (o = 0; o < 887; o++)
             {
-                for (k = 0; k < 740; k++)
+                for (k = 0; k < 887; k++)
                 {
 
                     learn[o][k][0] += (int)(temp[o][k][0] / 15);
@@ -55,15 +56,16 @@ int main()
             }
         }
         sprintf(p, "learned%d.bmp", i);
-        saveBMP(learn, 740, 887, p);
+        saveBMP(learn, 887, 887, p);
     }
+    */
 }
 void sefrer_learn()
 {
     int o, k;
     for (o = 0; o < 887; o++)
     {
-        for (k = 0; k < 740; k++)
+        for (k = 0; k < 887; k++)
         {
 
             learn[o][k][0] = 0;
