@@ -3,7 +3,8 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_native_dialog.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include <math.h>
 #include "myheder.h"
 
@@ -19,21 +20,16 @@ void must_init(bool test, const char *description)
     printf("couldn't initialize %s\n", description);
     exit(1);
 }
-
-
+ALLEGRO_FONT *font;
 int c = 1;
 
 int main()
 {
-    
-    int detcted_saat;
+
     must_init(al_init(), "allegro");
     must_init(al_install_keyboard(), "keyboard");
-    must_init(al_init_native_dialog_addon(), "dialog");
-
-    ALLEGRO_TIMER *timer = al_create_timer(1.0/10);
+    ALLEGRO_TIMER *timer = al_create_timer(1.0);
     must_init(timer, "timer");
-
     ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
     must_init(queue, "queue");
 
@@ -45,7 +41,7 @@ int main()
     ALLEGRO_DISPLAY *disp = al_create_display(width, hidth);
     must_init(disp, "display");
 
-    ALLEGRO_FONT *font = al_create_builtin_font();
+    font = al_create_builtin_font();
 
     must_init(font, "font");
     must_init(al_init_primitives_addon(), "primitives");
@@ -53,6 +49,13 @@ int main()
     al_register_event_source(queue, al_get_keyboard_event_source());
     al_register_event_source(queue, al_get_display_event_source(disp));
     al_register_event_source(queue, al_get_timer_event_source(timer));
+    al_install_audio();
+    al_init_acodec_addon();
+    ALLEGRO_SAMPLE *sample = NULL;
+    al_reserve_samples(1);
+    sample = al_load_sample("tiktok_WAV.wav");
+    if (sample == NULL)
+        printf("faild to load");
 
     bool done = false;
     bool redraw = true;
@@ -64,20 +67,16 @@ int main()
     int selected = 1;
     int screen_state = 0;
     int b_learned = 0;
+    int b_file_selected = 0;
     char path[100];
-    /*    
-    ALLEGRO_FILECHOOSER *filechooser;
-filechooser = al_create_native_file_dialog("./", "Choose a file.", "*.*", 1);
-al_show_native_file_dialog(disp, filechooser);
-
-const char* path = al_get_native_file_dialog_path(filechooser, 1);
-*/
-
-    /*#define KEY_SEEN 1
+    int detcted_saat;
+    int seccond = 0, minute = 0, hour = 0;
+    int s = 0, m = 0, h = 0;
+    /*
+#define KEY_SEEN 1
 #define KEY_RELEASED 2
 */
     unsigned char key[ALLEGRO_KEY_MAX];
-    int a = 0, b = 0, d = 0;
     memset(key, 0, sizeof(key));
 
     al_start_timer(timer);
@@ -111,7 +110,7 @@ const char* path = al_get_native_file_dialog_path(filechooser, 1);
         if (done)
             break;
 
-        if (redraw && al_is_event_queue_empty(queue) && screen_state == 0)
+        if (al_is_event_queue_empty(queue) && screen_state == 0)
         {
             al_clear_to_color(al_map_rgb(50, 50, 50));
             al_draw_textf(font, al_map_rgb(255, 255, 255), width / 2, 20, ALLEGRO_ALIGN_CENTER, "watchdetector");
@@ -129,30 +128,22 @@ const char* path = al_get_native_file_dialog_path(filechooser, 1);
             {
                 selected = 3;
             }
-
+            b_file_selected = 1;
             al_flip_display();
-
-            redraw = false;
-        }
-        //bastane safe
-        if (screen_state == 3)
-        {
-            done = true;
         }
 
-        if (al_is_event_queue_empty(queue) && screen_state == 1)
+        if (screen_state == 1)
         {
             al_clear_to_color(al_map_rgb(50, 150, 50));
-            if(fopen("fixedlearned9.bmp","r"))
+            if (fopen("fixedlearned9.bmp", "r"))
             {
-              b_learned = 1;  
+                b_learned = 1;
             }
             if (b_learned)
             {
                 al_draw_textf(font, al_map_rgb(255, 255, 255), width / 2, 100 + 60, ALLEGRO_ALIGN_CENTER, "learned succefuly");
                 al_flip_display();
             }
-            
             if (selected == 2)
             {
                 selected = 0;
@@ -176,65 +167,110 @@ const char* path = al_get_native_file_dialog_path(filechooser, 1);
                 printf("leaned");
             }
         }
-        if ( al_is_event_queue_empty(queue) && screen_state == 2)
+        // detecting hour
+        if (screen_state == 2)
         {
-            if (selected == 2 && event.keyboard.keycode == ALLEGRO_KEY_ENTER)
-            {
-                printf("selecting file\n");
-                al_draw_textf(font, al_map_rgb(255, 255, 255), 300, 140, ALLEGRO_ALIGN_CENTER, "openning");
-                /*
-                filechooser = al_create_native_file_dialog("", "Choose a file.", "*.*;*.bmp;", 1);
-                al_show_native_file_dialog(disp, filechooser);
-                const char * path = al_get_native_file_dialog_path(filechooser, 1);
-                if (path == 0)
-                {
-                    printf("faild to open");
-                }*/
-                printf("enter yuor file name");
-                gets(path);
-                printf("%s",path);
-                crop(path);
-                detcted_saat =  detecting();
-                //ALLEGRO_BITMAP *image = al_load_bitmap(path);
-                //al_draw_textf(font, al_map_rgb(255, 255, 255), 300, 140, ALLEGRO_ALIGN_CENTER, "%s",path);
-            }
+
             al_clear_to_color(al_map_rgb(140, 140, 250));
-            al_draw_filled_rectangle(140, 100, 140 + 400, 100 + 120, al_map_rgb(255, (selected == 2) * 100, (selected == 2) * 100));
-            al_draw_filled_rectangle(140, 250, 140 + 400, 250 + 120, al_map_rgb(255, (selected == 0) * 100, (selected == 0) * 100));
-            // al_draw_textf(font, al_map_rgb(255, 255, 255), width / 2, 400 + 60, ALLEGRO_ALIGN_CENTER, "start learn");
-            //al_draw_textf(font, al_map_rgb(255, 255, 255), width / 2, 550 + 60, ALLEGRO_ALIGN_CENTER, "main menu");
-            if (selected == 3)
+            al_draw_textf(font, al_map_rgb(255, 255, 255), width / 2, 40, ALLEGRO_ALIGN_CENTER, "openning file");
+            al_draw_filled_rectangle(140, 150, 140 + 400, 150 + 120, al_map_rgb(255, (selected == 4) * 100, (selected == 4) * 100));
+            al_draw_textf(font, al_map_rgb(255, 255, 255), width / 2, 150 + 60, ALLEGRO_ALIGN_CENTER, "circle hour");
+            al_draw_filled_rectangle(140, 300, 140 + 400, 300 + 120, al_map_rgb(255, (selected == 5) * 100, (selected == 5) * 100));
+            al_draw_textf(font, al_map_rgb(255, 255, 255), width / 2, 300 + 60, ALLEGRO_ALIGN_CENTER, "ellips hour");
+            al_draw_filled_rectangle(140, 450, 140 + 400, 450 + 120, al_map_rgb(255, (selected == 0) * 100, (selected == 0) * 100));
+            al_draw_textf(font, al_map_rgb(255, 255, 255), width / 2, 450 + 60, ALLEGRO_ALIGN_CENTER, "main menu");
+            al_flip_display();
+            if (!b_file_selected)
+            {
+                al_draw_textf(font, al_map_rgb(255, 255, 255), width / 2, 80, ALLEGRO_ALIGN_CENTER, "pleas entre file path in terminal and wait");
+                al_flip_display();
+                printf("selecting file...\n");
+                printf("enter yuor file name: ");
+                gets(path);
+                crop(path);
+                printf("\n**please wait a few seccend**\n");
+                detcted_saat = detecting();
+                seccond = detcted_saat % 100;
+                hour = detcted_saat / 10000;
+                minute = detcted_saat / 100 - hour * 100;
+                b_file_selected = 1;
+                s = (double)seccond;
+                m = (double)minute;
+                h = (double)hour;
+            }
+            al_draw_textf(font, al_map_rgb(255, 255, 255), width / 2, 120, ALLEGRO_ALIGN_CENTER, "detected hour is: %02d:%02d:%02d", hour, minute, seccond);
+            al_flip_display();
+            if (selected == 2)
+            {
+                selected = 4;
+            }
+            if (selected == 6)
             {
                 selected = 0;
             }
             if (selected == 1)
             {
-                selected = 2;
+                selected = 4;
             }
             if (selected == -1)
             {
-                selected = 2;
+                selected = 5;
             }
-            drawsaat(a, b, c);
-            al_draw_textf(font, al_map_rgb(255, 255, 255), 300, 140, ALLEGRO_ALIGN_CENTER, "%d", selected);
-            al_flip_display();
-            a++;
-            if (a == 60)
+            if (selected == 3)
             {
-                a = 0;
-                b++;
+                selected = 0;
             }
-            if (b == 60)
-            {
-                b = 0;
-                c++;
-            }
-            if (c == 24)
-            {
-                c = 0;
-            }
-            redraw = false;
         }
+
+        //bastane safe
+        if (screen_state == 3)
+        {
+            done = true;
+        }
+        //draw watchs
+        if (screen_state == 4)
+        {
+            selected = 2;
+            drawsaat(s,m,h);
+            s += 1;
+            if (s >= 60)
+            {
+                s = 0;
+                m++;
+            }
+            if (m >= 60)
+            {
+                m = 0;
+                h++;
+            }
+            if (h == 24)
+            {
+                h = 0;
+            }
+            al_play_sample(sample, 1.0, 0, 1.3, ALLEGRO_PLAYMODE_ONCE, NULL);
+        }
+        /*
+        if (screen_state == 4)
+        {
+            selected = 2;
+            drawsaat((int)s, (int)m, (int)h);
+            s += 1;
+            if (s >= 60)
+            {
+                s = 0;
+                m++;
+            }
+            if (m >= 60)
+            {
+                m = 0;
+                h++;
+            }
+            if (h == 24)
+            {
+                h = 0;
+            }
+            al_play_sample(sample, 1.0, 0, 1.3, ALLEGRO_PLAYMODE_ONCE, NULL);
+        }*/
     }
 
     al_destroy_font(font);
@@ -244,29 +280,26 @@ const char* path = al_get_native_file_dialog_path(filechooser, 1);
 
     return 0;
 }
-void drawsaat(int a, int b, int c)
+void drawsaat(int s, int m, int h)
 {
     double teta_sanie, teta_dagige, teta_saat;
 
-    teta_sanie = 2 * ALLEGRO_PI / 60 * a;
-    teta_dagige = 2 * ALLEGRO_PI / 60 * b;
-    teta_saat = 2 * ALLEGRO_PI / 60 * c * 5;
+    teta_sanie = 2 * ALLEGRO_PI / 60 * s;
+    teta_dagige = 2 * ALLEGRO_PI / 60 * m;
+    teta_saat = 2 * ALLEGRO_PI / 60 * c * h;
 
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-    //al_draw_textf(font, al_map_rgb(255, 255, 255), 300, 140, ALLEGRO_ALIGN_CENTER, "%d:%d:%d", c, b, a);
-    //al_draw_text(font, al_map_rgb(250, 252, 252), 300, 120, ALLEGRO_ALIGN_CENTER, "12");
-    //    al_draw_text(font, al_map_rgb(250, 250, 250), 300, 480, ALLEGRO_ALIGN_CENTER, "6");
-    //  al_draw_text(font, al_map_rgb(250, 250, 250), 480, 300, ALLEGRO_ALIGN_CENTER, "3");
-    //    al_draw_text(font, al_map_rgb(250, 250, 250), 120, 300, ALLEGRO_ALIGN_CENTER, "9");
-    al_draw_line(680/2, 680/2, 680/2 - 190 * cos(teta_sanie + ALLEGRO_PI / 2), 680/2 - 190 * sin(teta_sanie + ALLEGRO_PI / 2), al_map_rgb(0, 255, 0), 3);
-    al_draw_line(680/2, 680/2, 680/2 - 170 * cos(teta_dagige + ALLEGRO_PI / 2), 680/2 - 170 * sin(teta_dagige + ALLEGRO_PI / 2), al_map_rgb(0, 255, 255), 5);
-    al_draw_line(680/2, 680/2, 680/2 - 150 * cos(teta_saat + ALLEGRO_PI / 2), 680/2 - 150 * sin(teta_saat + ALLEGRO_PI / 2), al_map_rgb(255, 0, 25), 10);
-    al_draw_circle(680/2, 680/2, 200, al_map_rgb(255, 20, 20), 5);
-    al_draw_filled_circle(680/2, 680/2, 5, al_map_rgb(250, 220, 250));
-
-    //  al_play_sample(sample,1.0,0,1.1,ALLEGRO_PLAYMODE_ONCE,NULL);
-    //   al_draw_ellipse(a, a, 150, 50, al_map_rgb(0, 255, 0), 10);
-
+    al_clear_to_color(al_map_rgb(50, 50, 50));
+    al_draw_textf(font, al_map_rgb(255, 255, 255), 680 / 2, 680, ALLEGRO_ALIGN_CENTER, "%d:%d:%d", h, m, s);
+    al_draw_textf(font, al_map_rgb(255, 255, 255), 680 / 2, 700, ALLEGRO_ALIGN_CENTER, "press enter to back");
+    al_draw_text(font, al_map_rgb(250, 252, 252), 680 / 2, 60, ALLEGRO_ALIGN_CENTER, "12");
+    al_draw_text(font, al_map_rgb(250, 250, 250), 680 / 2, 610, ALLEGRO_ALIGN_CENTER, "6");
+    al_draw_text(font, al_map_rgb(250, 250, 250), 620, 680 / 2, ALLEGRO_ALIGN_CENTER, "3");
+    al_draw_text(font, al_map_rgb(250, 250, 250), 60, 680 / 2, ALLEGRO_ALIGN_CENTER, "9");
+    al_draw_line(680 / 2, 680 / 2, 680 / 2 - 290 * cos(teta_sanie + ALLEGRO_PI / 2), 680 / 2 - 290 * sin(teta_sanie + ALLEGRO_PI / 2), al_map_rgb(0, 255, 0), 3);
+    al_draw_line(680 / 2, 680 / 2, 680 / 2 - 270 * cos(teta_dagige + ALLEGRO_PI / 2), 680 / 2 - 270 * sin(teta_dagige + ALLEGRO_PI / 2), al_map_rgb(0, 255, 255), 5);
+    al_draw_line(680 / 2, 680 / 2, 680 / 2 - 250 * cos(teta_saat + ALLEGRO_PI / 2), 680 / 2 - 250 * sin(teta_saat + ALLEGRO_PI / 2), al_map_rgb(255, 0, 25), 10);
+    al_draw_circle(680 / 2, 680 / 2, 300, al_map_rgb(255, 20, 20), 5);
+    al_draw_filled_circle(680 / 2, 680 / 2, 5, al_map_rgb(250, 220, 250));
     al_flip_display();
 }
 
