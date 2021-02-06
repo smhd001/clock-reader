@@ -11,7 +11,7 @@
 unsigned char pic2[2000][2000][3];
 int abs(int);
 void drawsaat(int a, int b, int c);
-
+void draw_ellips_watch(int s, int m, int h);
 void must_init(bool test, const char *description)
 {
     if (test)
@@ -128,7 +128,7 @@ int main()
             {
                 selected = 3;
             }
-            b_file_selected = 1;
+            b_file_selected = 0;
             al_flip_display();
         }
 
@@ -221,7 +221,6 @@ int main()
                 selected = 0;
             }
         }
-
         //bastane safe
         if (screen_state == 3)
         {
@@ -231,7 +230,7 @@ int main()
         if (screen_state == 4)
         {
             selected = 2;
-            drawsaat(s,m,h);
+            drawsaat(s, m, h);
             s += 1;
             if (s >= 60)
             {
@@ -249,11 +248,11 @@ int main()
             }
             al_play_sample(sample, 1.0, 0, 1.3, ALLEGRO_PLAYMODE_ONCE, NULL);
         }
-        /*
-        if (screen_state == 4)
+
+        if (screen_state == 5)
         {
             selected = 2;
-            drawsaat((int)s, (int)m, (int)h);
+            draw_ellips_watch(s,m,h);
             s += 1;
             if (s >= 60)
             {
@@ -270,7 +269,7 @@ int main()
                 h = 0;
             }
             al_play_sample(sample, 1.0, 0, 1.3, ALLEGRO_PLAYMODE_ONCE, NULL);
-        }*/
+        }
     }
 
     al_destroy_font(font);
@@ -303,36 +302,30 @@ void drawsaat(int s, int m, int h)
     al_flip_display();
 }
 
+void draw_ellips_watch(int s, int m, int h)
+{
+    double teta, teta_dagige, teta_saat, r, r_dagige, r_saat, A = 150, B = 300;
+    teta = 2 * ALLEGRO_PI / 60 * s;
+    teta_dagige = 2 * ALLEGRO_PI / 60 * m;
+    teta_saat = 2 * ALLEGRO_PI / 60 * h * 5;
+    r = A * B / (sqrt(A * A * sin(teta + ALLEGRO_PI / 2) * sin(teta + ALLEGRO_PI / 2) + B * B * cos(teta + ALLEGRO_PI / 2) * cos(teta + ALLEGRO_PI / 2))) - 10;
+    r_dagige = A * B / (sqrt(A * A * sin(teta_dagige + ALLEGRO_PI / 2) * sin(teta_dagige + ALLEGRO_PI / 2) + B * B * cos(teta_dagige + ALLEGRO_PI / 2) * cos(teta_dagige + ALLEGRO_PI / 2))) - 30;
+    r_saat = A * B / (sqrt(A * A * sin(teta_saat + ALLEGRO_PI / 2) * sin(teta_saat + ALLEGRO_PI / 2) + B * B * cos(teta_saat + ALLEGRO_PI / 2) * cos(teta_saat + ALLEGRO_PI / 2))) - 50;
+    al_clear_to_color(al_map_rgb(30, 30, 30));
+    al_draw_textf(font, al_map_rgb(255, 255, 255), 680 / 2, 680, ALLEGRO_ALIGN_CENTER, "%d:%d:%d", h, m, s);
+    al_draw_textf(font, al_map_rgb(255, 255, 255), 680 / 2, 700, ALLEGRO_ALIGN_CENTER, "press enter to back");
+    al_draw_text(font, al_map_rgb(250, 252, 252), 680 / 2, 80, ALLEGRO_ALIGN_CENTER, "12");
+    al_draw_text(font, al_map_rgb(250, 250, 250), 680 / 2, 600, ALLEGRO_ALIGN_CENTER, "6");
+    al_draw_text(font, al_map_rgb(250, 250, 250), 470, 680 / 2, ALLEGRO_ALIGN_CENTER, "3");
+    al_draw_text(font, al_map_rgb(250, 250, 250), 210, 680 / 2, ALLEGRO_ALIGN_CENTER, "9");
+    al_draw_line(680 / 2, 680 / 2, 680 / 2 - r * cos(teta + ALLEGRO_PI / 2), 680 / 2 - r * sin(teta + ALLEGRO_PI / 2), al_map_rgb(0, 255, 0), 3);
+    al_draw_line(680 / 2, 680 / 2, 680 / 2 - r_dagige * cos(teta_dagige + ALLEGRO_PI / 2), 680 / 2 - r_dagige * sin(teta_dagige + ALLEGRO_PI / 2), al_map_rgb(0, 255, 255), 5);
+    al_draw_line(680 / 2, 680 / 2, 680 / 2 - r_saat * cos(teta_saat + ALLEGRO_PI / 2), 680 / 2 - r_saat * sin(teta_saat + ALLEGRO_PI / 2), al_map_rgb(255, 0, 25), 10);
+    al_draw_ellipse(680 / 2, 680 / 2, A, B, al_map_rgb(255, 20, 20), 5);
+    al_draw_filled_circle(680 / 2, 680 / 2, 5, al_map_rgb(250, 220, 250));
+    al_flip_display();
+//reaziat P:
 /*
-
-
-
-teta = 2 * ALLEGRO_PI / 60 * a;
-            teta_dagige = 2 * ALLEGRO_PI / 60 * b;
-            teta_saat = 2 * ALLEGRO_PI / 60 * c * 5;
-
-            r = A * B / (sqrt(A * A * sin(teta + ALLEGRO_PI / 2) * sin(teta + ALLEGRO_PI / 2) + B * B * cos(teta + ALLEGRO_PI / 2) * cos(teta + ALLEGRO_PI / 2)))-10;
-            r_dagige = A * B / (sqrt(A * A * sin(teta_dagige + ALLEGRO_PI / 2) * sin(teta_dagige + ALLEGRO_PI / 2) + B * B * cos(teta_dagige + ALLEGRO_PI / 2) * cos(teta_dagige + ALLEGRO_PI / 2)))-30;
-            r_saat= A * B / (sqrt(A * A * sin(teta_saat + ALLEGRO_PI / 2) * sin(teta_saat + ALLEGRO_PI / 2) + B * B * cos(teta_saat + ALLEGRO_PI / 2) * cos(teta_saat + ALLEGRO_PI / 2)))-50;
-            al_clear_to_color(al_map_rgb(0, 0, 0));
-        //  al_draw_textf(font, al_map_rgb(255, 255, 255), 300, 140, ALLEGRO_ALIGN_CENTER, "teta is %lf and r is %lf and sanie is:%lf", teta, r, a);
-            al_draw_text(font, al_map_rgb(250, 252, 252), 680/2, 80, ALLEGRO_ALIGN_CENTER, "12");
-            al_draw_text(font, al_map_rgb(250, 250, 250), 680/2, 600, ALLEGRO_ALIGN_CENTER, "6");
-            al_draw_text(font, al_map_rgb(250, 250, 250), 470, 680/2, ALLEGRO_ALIGN_CENTER, "3");
-            al_draw_text(font, al_map_rgb(250, 250, 250), 210, 680/2, ALLEGRO_ALIGN_CENTER, "9");
-            al_draw_line(680/2, 680/2, 680/2 - r * cos(teta + ALLEGRO_PI / 2), 680/2 - r * sin(teta + ALLEGRO_PI / 2), al_map_rgb(0, 255, 0), 3);
-            al_draw_line(680/2, 680/2, 680/2 - r_dagige * cos(teta_dagige + ALLEGRO_PI / 2), 680/2 - r_dagige * sin(teta_dagige + ALLEGRO_PI / 2), al_map_rgb(0, 255, 255), 5);
-            al_draw_line(680/2, 680/2, 680/2 - r_saat * cos(teta_saat + ALLEGRO_PI / 2), 680/2 - r_saat * sin(teta_saat + ALLEGRO_PI / 2), al_map_rgb(255, 0, 25), 10);
-            //    al_draw_circle(300, 300, 200, al_map_rgb(255, 20, 20), 5);
-            al_draw_ellipse(680/2, 680/2, A, B, al_map_rgb(255, 20, 20), 5);
-            al_draw_filled_circle(680/2, 680/2, 5, al_map_rgb(250, 220, 250));
-            al_draw_rectangle(0, 0, 10, 10, al_map_rgb(0, 22, 255), 5);
-            al_play_sample(sample, 1.0, 0, 1.1, ALLEGRO_PLAYMODE_ONCE, NULL);
-            //   al_draw_ellipse(a, a, 150, 50, al_map_rgb(0, 255, 0), 10);
-            a++;
-            al_flip_display();
-
-
 r
 teta = sanie * 60;
 2 * ALLEGRO_PI/60 * sanie = teta 
@@ -340,5 +333,5 @@ teta = sanie * 60;
 for a ellips 
 
 r = A*B/(sqrt(A*A*sin(teta + ALLEGRO_PI/2)*sin(teta+ALLEGRO_PI/2)+B*B*cos(teta+ALLEGRO_PI /2)*cos(teta*ALLEGRO_PI/2)))
-
 */
+}
