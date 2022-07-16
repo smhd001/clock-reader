@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <bmpio.h>
+#include "bmpio.h"
 #include "myheder.h"
 
 unsigned char pic[2000][2000][3];

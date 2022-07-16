@@ -2,7 +2,7 @@
 #define HOM
 
 #include <stdio.h>
-#include <bmpio.h>
+#include "bmpio.h"
 //start from imin,jmin and return i first time reach to a full whithe line -1 if unable to fine
 int i_tasefid(int jmin, int jmax, int imin, int imax);
 

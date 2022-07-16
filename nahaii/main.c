@@ -164,7 +164,7 @@ int main()
                 al_flip_display();
                 learning();
                 b_learned = 1;
-                printf("leaned");
+                printf("learned");
             }
         }
         // detecting hour and chosing hour menu

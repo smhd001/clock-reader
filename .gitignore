@@ -1,5 +1,6 @@
 *
 !*.c
+!*.h
 !*/
 test.*
 test1.*
@@ -8,3 +9,4 @@ temp.*
 temp1.*
 temp2.*
 faze2/tempCodeRunnerFile.c
+faze*

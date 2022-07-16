@@ -1,29 +1,5 @@
-# README #
-
-This README would normally document whatever steps are necessary to get your application up and running.
-
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contactseyed mohamad
+- [ ] opmtize huge memory usage
+  i don't know how the fuck this use this many memry this shit is stack memory why it'S not stack over folowin while using a few gig of ram
+  seems valgrind could be usefull
+  alos cherno has a bonch of good video about profiling
+- [ ] writing a cli only version to help
